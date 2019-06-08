@@ -135,6 +135,84 @@ void Fin(vector<Mystruct>& user, int n, ifstream &fin)
 	system("pause");
 }
 
+void Online_amount(vector<Mystruct>& user, int n)
+{
+	vector <int> index;
+	bool find = false;
+	int month, amount_online = 0;
+	for (size_t i = 0; i < n; i++)
+	{
+		if (user[i].data_online[3] == 2018)
+			index.push_back(i);
+	}
+
+	cout << "Введите номер месяца: ";
+	cin >> month;
+	for (size_t i = 0; i < index.size(); i++)
+	{
+		if (user[i].data_online[2] == month)
+		{
+			amount_online++;
+			find = true;
+		}
+	}
+	if (find)
+		cout << endl << "Количество сеансов - " << amount_online << endl;
+	else
+		cout << endl << "Не найдено пользователей" << endl;
+	system("pause");
+}
+
+void Exchange(vector<Mystruct>& user, int n, vector<int>& time_online)
+{
+	for (size_t i = 0; i < n; i++)
+	{
+		time_online[i] = (user[i].time_end[1] * 3600 + user[i].time_end[2] * 60 + user[i].time_end[3]) -
+			(user[i].begin_time_online[1] * 3600 + user[i].begin_time_online[2] * 60 + user[i].begin_time_online[3]);
+	}
+}
+
+void Max_online(vector<Mystruct>& user, int n, vector<int>& time_online)
+{
+	int data[3];
+	bool find = false;
+	vector<int> index;
+	vector<int> time;
+	int max_time, index_max;
+	Exchange(user, n, time_online);
+	cout << "Введите дату (через пробел) - ";
+	for (size_t i = 0; i < 3; i++)
+	{
+		cin >> data[i];
+	}
+	for (size_t i = 0; i < n; i++)
+	{
+		if (user[i].data_online[1] == data[1] && user[i].data_online[2] == data[2] && user[i].data_online[3] == data[3])
+		{
+			index.push_back(i);
+			time.push_back(time_online[i]);
+			find = true;
+		}
+	}
+	if (find)
+	{
+		max_time = time[0];
+		for (size_t i = 0; i < index.size(); i++)
+		{
+			if (time[i] > max_time)
+			{
+				max_time = time[i];
+				index_max = i;
+			}
+		}
+		cout << endl << "Логин: " << user[index_max].login << endl;
+		cout << endl << "Максимальное время сеанса - " << max_time << "cекунд\n";
+	}
+	else
+		cout << endl << "Не найдено пользователей" << endl;
+	system("pause");
+}
+
 void Menu(vector<Mystruct>& user, int n, ofstream &out, ifstream &fin)
 {
     link:
@@ -163,6 +241,8 @@ void Menu(vector<Mystruct>& user, int n, ofstream &out, ifstream &fin)
 		goto link;
 		break;
 	case 4:
+		Online_amount(user, n);
+		goto link;
 		break;
 	case 5:
 		break;
@@ -183,6 +263,8 @@ int main()
 	cout << "Введите количество пользователей:" << endl;
 	cin >> n;
 	vector<Mystruct> user(n);
+	vector<int> time_online(n);
+
 
 	cout << "Вы хотите добавить заполнить или импортировать готовые данные? ( 1 - Заполнить | 2 - Импортировать)\n";
 	cin >> selection;
